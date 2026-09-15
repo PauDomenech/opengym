@@ -24,6 +24,7 @@ import {
   ChevronRight,
   Zap,
   Sparkles,
+  Disc,
 } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -202,11 +203,11 @@ export const App: React.FC = () => {
               e.currentTarget.style.display = 'none';
             }}
           />
-          <div>
-            <h1 style={{ fontSize: '1.35rem', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.1, margin: 0 }}>
-              Open<span style={{ color: 'var(--accent-primary)' }}>Gym</span>
+          <div className="app-header-title-box">
+            <h1 className="app-header-title">
+              Open<span>Gym</span>
             </h1>
-            <span className="header-subtitle" style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+            <span className="header-subtitle">
               Open-source GymApp
             </span>
           </div>
@@ -215,52 +216,45 @@ export const App: React.FC = () => {
         {/* Quick Actions */}
         <div className="app-header-actions">
           <button
-            className="clean-button header-action-btn"
-            style={{
-              background: '#111318',
-              color: '#ffffff',
-              borderColor: '#111318',
-            }}
+            className="header-coach-btn"
             onClick={() => setIsCoachModalOpen(true)}
             title="Coach Científico 100% Offline (Evidencia & Preguntas Guiadas)"
           >
-            <Sparkles size={13} color="#60a5fa" /> <span>Ciencia</span>
+            <Sparkles size={14} className="sparkle-icon" />
+            <span className="header-btn-text">Coach</span>
           </button>
 
           <button
-            className="clean-button header-action-btn"
-            style={{
-              background: '#eff6ff',
-              color: 'var(--accent-primary)',
-              borderColor: '#bfdbfe',
-            }}
+            className="header-tool-btn"
             onClick={() => setIsStrengthModalOpen(true)}
-            title="Calculadora de Fuerza y Nivel Físico"
+            title="Calculadora de Fuerza y Nivel Físico (1RM)"
           >
-            <Zap size={13} /> <span>Fuerza</span>
+            <Zap size={14} color="var(--accent-primary)" />
+            <span className="header-btn-text-desktop">Fuerza</span>
           </button>
 
           <button
-            className="clean-button header-action-btn"
+            className="header-tool-btn"
             onClick={() => {
               setPlateCalcWeight(60);
               setIsPlateCalcOpen(true);
             }}
             title="Calculadora de discos y barra"
           >
-            Discos
+            <Disc size={14} color="#64748b" />
+            <span className="header-btn-text-desktop">Discos</span>
           </button>
 
           <button
-            className="clean-button-icon"
-            style={{ width: '32px', height: '32px' }}
+            className="header-tool-btn header-timer-btn"
             onClick={() => {
               setRestTimerSeconds(90);
               setIsRestTimerOpen(true);
             }}
             title="Cronómetro de descanso"
           >
-            <Clock size={14} color="var(--accent-primary)" />
+            <Clock size={14} color="#64748b" />
+            <span className="header-btn-text-desktop">Timer</span>
           </button>
         </div>
       </header>
