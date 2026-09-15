@@ -1,39 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <defs>
-    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#3B82F6" />
-      <stop offset="100%" stop-color="#1D4ED8" />
-    </linearGradient>
-    <linearGradient id="plateGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#2563EB" />
-      <stop offset="100%" stop-color="#1E40AF" />
-    </linearGradient>
-    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#2563EB" flood-opacity="0.3" />
-    </filter>
-  </defs>
-
-  <!-- Clean White / Off-white Rounded Squircle Background -->
-  <rect width="512" height="512" rx="128" fill="#FFFFFF" />
-  <rect x="8" y="8" width="496" height="496" rx="120" stroke="#F1F5F9" stroke-width="8" />
-
-  <!-- Modern OpenGym Hexagon Dumbbell / Strength Symbol -->
-  <g filter="url(#softShadow)" transform="translate(0, 0)">
-    <!-- Dumbbell Central Knurled Bar -->
-    <rect x="186" y="242" width="140" height="28" rx="14" fill="#0F172A" />
+  <!-- Matte Black Background with rounded corners -->
+  <rect width="512" height="512" rx="112" fill="#111318" />
+  
+  <!-- Minimalist Barbell Top Half (Electric Royal Blue) -->
+  <g fill="#2563EB">
+    <!-- Center Bar Top -->
+    <rect x="180" y="240" width="152" height="16" />
     
-    <!-- Left Main Heavy Hexagonal Plate -->
-    <path d="M120 180 L166 150 L166 362 L120 332 L95 256 Z" fill="url(#blueGrad)" />
-    <!-- Left Outer Plate -->
-    <path d="M85 200 L110 185 L110 327 L85 312 L70 256 Z" fill="url(#plateGrad)" />
-
-    <!-- Right Main Heavy Hexagonal Plate -->
-    <path d="M392 180 L346 150 L346 362 L392 332 L417 256 Z" fill="url(#blueGrad)" />
-    <!-- Right Outer Plate -->
-    <path d="M427 200 L402 185 L402 327 L427 312 L442 256 Z" fill="url(#plateGrad)" />
-
-    <!-- Center 'O' / Open Dynamic Ring -->
-    <circle cx="256" cy="256" r="42" stroke="url(#blueGrad)" stroke-width="14" fill="#FFFFFF" />
-    <path d="M256 214 A 42 42 0 0 1 298 256" stroke="#2563EB" stroke-width="16" stroke-linecap="round" fill="none" />
+    <!-- Left Inner Collar Top -->
+    <rect x="136" y="160" width="40" height="96" rx="16" />
+    <!-- Left Outer Plate Top -->
+    <rect x="76" y="190" width="44" height="66" rx="14" />
+    
+    <!-- Right Inner Collar Top -->
+    <rect x="336" y="160" width="40" height="96" rx="16" />
+    <!-- Right Outer Plate Top -->
+    <rect x="392" y="190" width="44" height="66" rx="14" />
   </g>
+
+  <!-- Minimalist Barbell Bottom Half (Pure Crisp White) -->
+  <g fill="#FFFFFF">
+    <!-- Center Bar Bottom -->
+    <rect x="180" y="256" width="152" height="16" />
+    
+    <!-- Left Inner Collar Bottom -->
+    <rect x="136" y="256" width="40" height="96" rx="16" />
+    <!-- Left Outer Plate Bottom -->
+    <rect x="76" y="256" width="44" height="66" rx="14" />
+    
+    <!-- Right Inner Collar Bottom -->
+    <rect x="336" y="256" width="40" height="96" rx="16" />
+    <!-- Right Outer Plate Bottom -->
+    <rect x="392" y="256" width="44" height="66" rx="14" />
+  </g>
+
+  <!-- Subtle dividing line / contrast -->
+  <line x1="76" y1="256" x2="436" y2="256" stroke="#111318" stroke-width="3" />
 </svg>
