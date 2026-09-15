@@ -1,5 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { COACH_TOPICS, CoachTopic } from '../../data/scientificCoachData';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import {
+  COACH_TOPICS,
+  COACH_CATEGORIES,
+  CoachTopic,
+  CoachCategory,
+} from '../../data/scientificCoachData';
 import {
   Sparkles,
   Search,
@@ -9,6 +14,9 @@ import {
   CheckCircle2,
   ArrowRight,
   HelpCircle,
+  Send,
+  Lightbulb,
+  MessageSquare,
 } from 'lucide-react';
 
 interface ChatMessage {
@@ -16,6 +24,7 @@ interface ChatMessage {
   sender: 'bot' | 'user';
   text?: string;
   topic?: CoachTopic;
+  matchedVariant?: string;
   timestamp: string;
 }
 
@@ -28,17 +37,23 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
   isOpen,
   onClose,
 }) => {
+  // Calculate total indexed questions dynamically
+  const totalQuestionsCount = useMemo(() => {
+    return COACH_TOPICS.reduce((acc, t) => acc + 1 + (t.questionVariants?.length || 0), 0);
+  }, []);
+
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome-1',
       sender: 'bot',
-      text: '¡Hola! Soy tu **Coach Científico OpenGym**. Estoy programado con la evidencia más sólida de la literatura deportiva (meta-análisis de Schoenfeld, Morton, Phillips, Zourdos, etc.) y funciono **100% offline** sin APIs ni costes.\n\n¿Sobre qué tema te gustaría consultar hoy? Puedes buscar directamente o elegir una de las preguntas guiadas:',
+      text: `¡Hola! Soy tu **Coach Científico OpenGym**.\n\nCuento con una base de conocimiento de **+${totalQuestionsCount} preguntas y escenarios indexados** basados en meta-análisis y estudios universitarios (Brad Schoenfeld, Morton & Phillips, Zourdos, Milo Wolf, Stu McGill, etc.).\n\n💡 **100% Offline y sin IA**: Respuestas instantáneas y rigurosas. Puedes escribir cualquier duda abajo o explorar por categorías:`,
       timestamp: 'Ahora',
     },
   ]);
 
-  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [activeCategory, setActiveCategory] = useState<CoachCategory | 'all'>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [inputText, setInputText] = useState<string>('');
   const [isTyping, setIsTyping] = useState<boolean>(false);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -47,51 +62,121 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  if (!isOpen) return null;
+  // Search through all topics, questions, variants, keywords and summary
+  const filteredTopics = useMemo(() => {
+    return COACH_TOPICS.filter((t) => {
+      const matchesCat = activeCategory === 'all' || t.category === activeCategory;
+      if (!matchesCat) return false;
 
-  const categories = [
-    { key: 'all', label: 'Todos' },
-    { key: 'hypertrophy', label: '🔬 Hipertrofia' },
-    { key: 'strength', label: '⚡ Fuerza' },
-    { key: 'nutrition', label: '🥗 Nutrición' },
-    { key: 'recovery', label: '🛌 Descanso & Deload' },
-    { key: 'biomechanics', label: '🛡️ Articulaciones' },
-    { key: 'cardio', label: '🏃 Cardio' },
-  ];
+      if (!searchTerm.trim()) return true;
 
-  const filteredTopics = COACH_TOPICS.filter((t) => {
-    const matchesCat = activeCategory === 'all' || t.category === activeCategory;
-    const matchesSearch =
-      !searchTerm.trim() ||
-      t.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.keywords.some((k) => k.toLowerCase().includes(searchTerm.toLowerCase()));
-    return matchesCat && matchesSearch;
-  });
+      const term = searchTerm.toLowerCase().trim();
+      const inPrimary = t.question.toLowerCase().includes(term);
+      const inShort = t.shortQuestion.toLowerCase().includes(term);
+      const inSummary = t.summary.toLowerCase().includes(term);
+      const inKeywords = t.keywords.some((k) => k.toLowerCase().includes(term));
+      const inVariants = t.questionVariants.some((v) => v.toLowerCase().includes(term));
+      const inStudies = t.keyStudies.some((s) => s.toLowerCase().includes(term));
 
-  const handleSelectTopic = (topic: CoachTopic) => {
-    // 1. Add user message
+      return inPrimary || inShort || inSummary || inKeywords || inVariants || inStudies;
+    });
+  }, [activeCategory, searchTerm]);
+
+  // Handle direct selection of a topic
+  const handleSelectTopic = (topic: CoachTopic, customQuestionText?: string) => {
     const userMsg: ChatMessage = {
       id: `user-${Date.now()}`,
       sender: 'user',
-      text: topic.question,
+      text: customQuestionText || topic.question,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
     setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
 
-    // 2. Simulate swift, natural offline response
     setTimeout(() => {
       const botMsg: ChatMessage = {
         id: `bot-${Date.now()}`,
         sender: 'bot',
         topic: topic,
+        matchedVariant: customQuestionText,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, botMsg]);
       setIsTyping(false);
-    }, 280);
+    }, 250);
+  };
+
+  // Find best matching topic from natural language input
+  const handleSendCustomQuery = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const query = inputText.trim();
+    if (!query) return;
+
+    setInputText('');
+
+    // Score all topics based on word intersections
+    const queryWords = query
+      .toLowerCase()
+      .replace(/[¿?.,!¡]/g, '')
+      .split(/\s+/)
+      .filter((w) => w.length > 2);
+
+    let bestMatch: CoachTopic | null = null;
+    let bestScore = -1;
+
+    for (const topic of COACH_TOPICS) {
+      let score = 0;
+
+      // Exact substring matches
+      if (topic.question.toLowerCase().includes(query.toLowerCase())) score += 15;
+      if (topic.shortQuestion.toLowerCase().includes(query.toLowerCase())) score += 12;
+
+      // Match in variants
+      for (const variant of topic.questionVariants) {
+        if (variant.toLowerCase().includes(query.toLowerCase())) {
+          score += 10;
+        }
+      }
+
+      // Keyword & Word overlap
+      for (const word of queryWords) {
+        if (topic.keywords.some((k) => k.toLowerCase().includes(word))) score += 4;
+        if (topic.question.toLowerCase().includes(word)) score += 3;
+        if (topic.summary.toLowerCase().includes(word)) score += 2;
+        if (topic.questionVariants.some((v) => v.toLowerCase().includes(word))) score += 2;
+      }
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = topic;
+      }
+    }
+
+    if (bestMatch && bestScore > 0) {
+      handleSelectTopic(bestMatch, query);
+    } else {
+      // Fallback message if no match found
+      const userMsg: ChatMessage = {
+        id: `user-${Date.now()}`,
+        sender: 'user',
+        text: query,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setMessages((prev) => [...prev, userMsg]);
+      setIsTyping(true);
+
+      setTimeout(() => {
+        const botMsg: ChatMessage = {
+          id: `bot-${Date.now()}`,
+          sender: 'bot',
+          text: `No he encontrado una coincidencia exacta para "${query}".\n\nPrueba buscando palabras clave como **"creatina"**, **"RIR"**, **"series"**, **"pecho superior"**, **"sentadilla"**, **"proteína"** o selecciona uno de los temas sugeridos abajo:`,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+        setMessages((prev) => [...prev, botMsg]);
+        setIsTyping(false);
+      }, 250);
+    }
   };
 
   const handleResetChat = () => {
@@ -99,13 +184,16 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
       {
         id: `welcome-${Date.now()}`,
         sender: 'bot',
-        text: '¡Conversación reiniciada! Selecciona cualquier tema para ver su desglose basado en evidencia científica:',
+        text: `¡Conversación reiniciada!\n\nPregunta sobre cualquier duda (+${totalQuestionsCount} preguntas indexadas) o explora por categorías:`,
         timestamp: 'Ahora',
       },
     ]);
     setSearchTerm('');
+    setInputText('');
     setActiveCategory('all');
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="clean-modal-overlay" onClick={onClose}>
@@ -113,14 +201,15 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
         className="clean-modal-content"
         onClick={(e) => e.stopPropagation()}
         style={{
-          maxWidth: '680px',
-          height: '88vh',
+          maxWidth: '720px',
+          height: '90vh',
           display: 'flex',
           flexDirection: 'column',
           padding: 0,
           overflow: 'hidden',
           borderRadius: 'var(--radius-xl)',
           background: '#ffffff',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
         }}
       >
         {/* Top Header Bar */}
@@ -140,26 +229,28 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
               onClick={onClose}
               className="clean-button-icon"
               style={{ width: '36px', height: '36px' }}
+              title="Cerrar modal"
             >
               <ChevronLeft size={20} />
             </button>
             <div
               style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '10px',
+                width: '38px',
+                height: '38px',
+                borderRadius: '12px',
                 background: '#111318',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#2563EB',
+                color: '#60a5fa',
+                flexShrink: 0,
               }}
             >
-              <Sparkles size={18} />
+              <Sparkles size={20} />
             </div>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 style={{ fontSize: '1.08rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                   Coach Científico
                 </h3>
                 <span
@@ -168,16 +259,16 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
                     color: 'var(--accent-primary)',
                     fontSize: '0.68rem',
                     fontWeight: 700,
-                    padding: '2px 6px',
+                    padding: '2px 7px',
                     borderRadius: 'var(--radius-pill)',
                     border: '1px solid #bfdbfe',
                   }}
                 >
-                  100% Offline
+                  +{totalQuestionsCount} Preguntas Indexadas
                 </span>
               </div>
               <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                Basado en Meta-Análisis & Evidencia Universitaria
+                100% Offline • Respaldado por Meta-Análisis Universitarios
               </div>
             </div>
           </div>
@@ -185,7 +276,7 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
           <button
             onClick={handleResetChat}
             className="clean-button"
-            style={{ padding: '6px 10px', fontSize: '0.75rem', gap: '4px' }}
+            style={{ padding: '6px 11px', fontSize: '0.75rem', gap: '4px' }}
             title="Reiniciar chat"
           >
             <RotateCcw size={13} /> Reiniciar
@@ -201,27 +292,49 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
             display: 'flex',
             gap: '6px',
             overflowX: 'auto',
+            scrollbarWidth: 'none',
           }}
         >
-          {categories.map((cat) => (
-            <button
-              key={cat.key}
-              onClick={() => setActiveCategory(cat.key)}
-              className="clean-button"
-              style={{
-                padding: '5px 12px',
-                fontSize: '0.76rem',
-                borderRadius: 'var(--radius-pill)',
-                fontWeight: activeCategory === cat.key ? 700 : 500,
-                background: activeCategory === cat.key ? '#111318' : '#ffffff',
-                color: activeCategory === cat.key ? '#ffffff' : 'var(--text-secondary)',
-                borderColor: activeCategory === cat.key ? '#111318' : '#e2e8f0',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {cat.label}
-            </button>
-          ))}
+          <button
+            onClick={() => setActiveCategory('all')}
+            className="clean-button"
+            style={{
+              padding: '5px 12px',
+              fontSize: '0.76rem',
+              borderRadius: 'var(--radius-pill)',
+              fontWeight: activeCategory === 'all' ? 700 : 500,
+              background: activeCategory === 'all' ? '#111318' : '#ffffff',
+              color: activeCategory === 'all' ? '#ffffff' : 'var(--text-secondary)',
+              borderColor: activeCategory === 'all' ? '#111318' : '#e2e8f0',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+            }}
+          >
+            📚 Todos ({COACH_TOPICS.length})
+          </button>
+          {COACH_CATEGORIES.map((cat) => {
+            const count = COACH_TOPICS.filter((t) => t.category === cat.id).length;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className="clean-button"
+                style={{
+                  padding: '5px 12px',
+                  fontSize: '0.76rem',
+                  borderRadius: 'var(--radius-pill)',
+                  fontWeight: activeCategory === cat.id ? 700 : 500,
+                  background: activeCategory === cat.id ? '#111318' : '#ffffff',
+                  color: activeCategory === cat.id ? '#ffffff' : 'var(--text-secondary)',
+                  borderColor: activeCategory === cat.id ? '#111318' : '#e2e8f0',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                }}
+              >
+                {cat.icon} {cat.label} ({count})
+              </button>
+            );
+          })}
         </div>
 
         {/* Chat Feed Area */}
@@ -265,7 +378,7 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
                 key={msg.id}
                 style={{
                   alignSelf: 'flex-start',
-                  maxWidth: '92%',
+                  maxWidth: '96%',
                   display: 'flex',
                   gap: '10px',
                 }}
@@ -274,12 +387,12 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
                   style={{
                     width: '32px',
                     height: '32px',
-                    borderRadius: '8px',
+                    borderRadius: '9px',
                     background: '#111318',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#2563EB',
+                    color: '#60a5fa',
                     flexShrink: 0,
                     marginTop: '2px',
                   }}
@@ -312,7 +425,7 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
                         background: '#ffffff',
                         border: '1px solid #cbd5e1',
                         borderRadius: '4px 18px 18px 18px',
-                        padding: '18px',
+                        padding: '18px 20px',
                         boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
                         display: 'flex',
                         flexDirection: 'column',
@@ -334,7 +447,7 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
                         </span>
                         <h4
                           style={{
-                            fontSize: '1.08rem',
+                            fontSize: '1.12rem',
                             fontWeight: 800,
                             color: 'var(--text-primary)',
                             margin: '4px 0 0 0',
@@ -359,7 +472,7 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
                       >
                         <CheckCircle2 size={18} color="#16a34a" style={{ flexShrink: 0, marginTop: '2px' }} />
                         <div>
-                          <div style={{ fontSize: '0.76rem', fontWeight: 700, color: '#15803d', marginBottom: '2px' }}>
+                          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#15803d', marginBottom: '2px' }}>
                             CONCLUSIÓN CIENTÍFICA (TL;DR)
                           </div>
                           <div style={{ fontSize: '0.88rem', color: '#166534', fontWeight: 600, lineHeight: 1.4 }}>
@@ -380,8 +493,8 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
 
                       {/* Practical Advice Bullets */}
                       <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: 'var(--radius-md)', border: '1px solid #e2e8f0' }}>
-                        <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>
-                          💡 Cómo aplicarlo en tu entrenamiento:
+                        <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                          <Lightbulb size={14} color="#f59e0b" /> Cómo aplicarlo en tu entrenamiento:
                         </div>
                         <ul style={{ margin: 0, paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
                           {msg.topic.practicalAdvice.map((adv, idx) => (
@@ -404,8 +517,33 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
                         ))}
                       </div>
 
+                      {/* Question Variants Tags (Other ways people ask this) */}
+                      {msg.topic.questionVariants && msg.topic.questionVariants.length > 0 && (
+                        <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
+                          <div style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <MessageSquare size={12} /> Otras formas comunes de preguntar esto (+{msg.topic.questionVariants.length} variaciones indexadas):
+                          </div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                            {msg.topic.questionVariants.slice(0, 8).map((variant, vIdx) => (
+                              <span
+                                key={vIdx}
+                                style={{
+                                  fontSize: '0.72rem',
+                                  padding: '2px 8px',
+                                  background: '#f1f5f9',
+                                  color: '#475569',
+                                  borderRadius: 'var(--radius-pill)',
+                                }}
+                              >
+                                {variant}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       {/* Follow-up Question Chips */}
-                      {msg.topic.relatedQuestionIds.length > 0 && (
+                      {msg.topic.relatedQuestionIds && msg.topic.relatedQuestionIds.length > 0 && (
                         <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
                           <div style={{ fontSize: '0.76rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '8px' }}>
                             Preguntas relacionadas:
@@ -420,7 +558,7 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
                                   onClick={() => handleSelectTopic(relTopic)}
                                   className="clean-button"
                                   style={{
-                                    padding: '5px 10px',
+                                    padding: '5px 11px',
                                     fontSize: '0.76rem',
                                     borderRadius: 'var(--radius-pill)',
                                     background: '#eff6ff',
@@ -449,17 +587,17 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
                 style={{
                   width: '28px',
                   height: '28px',
-                  borderRadius: '6px',
+                  borderRadius: '7px',
                   background: '#111318',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#2563EB',
+                  color: '#60a5fa',
                 }}
               >
                 <Sparkles size={14} />
               </div>
-              <span>Consultando literatura científica...</span>
+              <span>Consultando meta-análisis y base de conocimiento...</span>
             </div>
           )}
 
@@ -469,7 +607,7 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
         {/* Quick Suggested Questions Grid (Drawer / Bottom Section) */}
         <div
           style={{
-            padding: '14px 18px',
+            padding: '12px 18px',
             borderTop: '1px solid #e2e8f0',
             background: '#ffffff',
             display: 'flex',
@@ -482,21 +620,21 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
             <Search size={15} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
             <input
               type="text"
-              placeholder="Buscar tema (ej: creatina, RIR, series, deload, dolor hombro)..."
+              placeholder={`Filtrar entre +${totalQuestionsCount} preguntas (ej: creatina, RIR, series, deload, dolor hombro)...`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="clean-input"
               style={{
                 padding: '8px 12px 8px 36px',
-                fontSize: '0.84rem',
+                fontSize: '0.82rem',
                 borderRadius: 'var(--radius-md)',
               }}
             />
           </div>
 
           {/* Question Pills Horizontal / Wrap */}
-          <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '2px' }}>
-            {filteredTopics.slice(0, 6).map((topic) => (
+          <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '2px', scrollbarWidth: 'none' }}>
+            {filteredTopics.slice(0, 8).map((topic) => (
               <button
                 key={topic.id}
                 onClick={() => handleSelectTopic(topic)}
@@ -520,8 +658,36 @@ export const ScientificCoachModal: React.FC<ScientificCoachModalProps> = ({
               </button>
             ))}
           </div>
+
+          {/* Natural Language Input Bar */}
+          <form onSubmit={handleSendCustomQuery} style={{ display: 'flex', gap: '8px' }}>
+            <input
+              type="text"
+              placeholder="Haz tu pregunta al Coach (ej: ¿cuánta proteína debo tomar?)..."
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              className="clean-input"
+              style={{
+                flex: 1,
+                padding: '9px 14px',
+                fontSize: '0.86rem',
+                borderRadius: 'var(--radius-md)',
+              }}
+            />
+            <button
+              type="submit"
+              className="clean-button clean-button-primary"
+              style={{ padding: '0 16px', borderRadius: 'var(--radius-md)' }}
+              disabled={!inputText.trim()}
+              title="Enviar pregunta"
+            >
+              <Send size={15} />
+            </button>
+          </form>
         </div>
       </div>
     </div>
   );
 };
+
+export default ScientificCoachModal;
