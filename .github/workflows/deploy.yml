@@ -1,4 +1,4 @@
-name: Deploy GymPulse to GitHub Pages
+name: Deploy OpenGym to GitHub Pages
 
 on:
   push:
