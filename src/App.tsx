@@ -215,63 +215,52 @@ export const App: React.FC = () => {
         {/* Quick Actions */}
         <div className="app-header-actions">
           <button
-            className="clean-button"
+            className="clean-button header-action-btn"
             style={{
-              padding: '6px 11px',
-              fontSize: '0.78rem',
-              borderRadius: 'var(--radius-pill)',
               background: '#111318',
               color: '#ffffff',
               borderColor: '#111318',
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
             }}
             onClick={() => setIsCoachModalOpen(true)}
             title="Coach Científico 100% Offline (Evidencia & Preguntas Guiadas)"
           >
-            <Sparkles size={13} color="#60a5fa" /> <span className="hidden-mobile">Coach </span>Ciencia
+            <Sparkles size={13} color="#60a5fa" /> <span>Ciencia</span>
           </button>
 
           <button
-            className="clean-button"
+            className="clean-button header-action-btn"
             style={{
-              padding: '6px 11px',
-              fontSize: '0.78rem',
-              borderRadius: 'var(--radius-pill)',
               background: '#eff6ff',
               color: 'var(--accent-primary)',
               borderColor: '#bfdbfe',
-              fontWeight: 700,
             }}
             onClick={() => setIsStrengthModalOpen(true)}
             title="Calculadora de Fuerza y Nivel Físico"
           >
-            <Zap size={14} /> <span className="hidden-mobile">Evaluar </span>Fuerza
+            <Zap size={13} /> <span>Fuerza</span>
           </button>
 
           <button
-            className="clean-button"
-            style={{ padding: '6px 11px', fontSize: '0.78rem', borderRadius: 'var(--radius-pill)' }}
+            className="clean-button header-action-btn"
             onClick={() => {
               setPlateCalcWeight(60);
               setIsPlateCalcOpen(true);
             }}
+            title="Calculadora de discos y barra"
           >
             Discos
           </button>
 
           <button
             className="clean-button-icon"
-            style={{ width: '34px', height: '34px' }}
+            style={{ width: '32px', height: '32px' }}
             onClick={() => {
               setRestTimerSeconds(90);
               setIsRestTimerOpen(true);
             }}
             title="Cronómetro de descanso"
           >
-            <Clock size={15} color="var(--accent-primary)" />
+            <Clock size={14} color="var(--accent-primary)" />
           </button>
         </div>
       </header>

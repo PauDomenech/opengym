@@ -33,21 +33,33 @@ export const MuscleBodyMap: React.FC<MuscleBodyMapProps> = ({
     'abdominals',
     'obliques',
     'quadriceps',
+    'adductors',
+    'abductors',
+    'glutes',
     'forearms',
+    'calves',
   ];
 
   const backMuscles: MuscleGroup[] = [
     'traps',
     'lats',
+    'middle back',
     'shoulders',
     'triceps',
     'lower back',
     'glutes',
+    'abductors',
+    'adductors',
     'hamstrings',
     'calves',
   ];
 
   const currentMuscleList = view === 'front' ? frontMuscles : backMuscles;
+
+  const getCleanMuscleName = (m: MuscleGroup): string => {
+    const raw = MUSCLES_INFO[m]?.nameEs || m;
+    return raw.split(' / ')[0].split(' (')[0];
+  };
 
   return (
     <div className="clean-card" style={{ padding: '20px', marginBottom: '20px' }}>
@@ -67,7 +79,7 @@ export const MuscleBodyMap: React.FC<MuscleBodyMapProps> = ({
             Selector Muscular Anatómico
           </h3>
           <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)' }}>
-            Toca cualquier músculo para ver sus ejercicios específicos
+            Toca cualquier músculo para filtrar ejercicios específicos
           </p>
         </div>
 
@@ -171,7 +183,7 @@ export const MuscleBodyMap: React.FC<MuscleBodyMapProps> = ({
             >
               <defs>
                 <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#2563EB" flood-opacity="0.4" />
+                  <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="#2563EB" floodOpacity="0.4" />
                 </filter>
               </defs>
 
@@ -288,8 +300,24 @@ export const MuscleBodyMap: React.FC<MuscleBodyMapProps> = ({
                 <title>Oblicuos Izquierdos</title>
               </path>
 
-              {/* Pelvis */}
+              {/* Pelvis base */}
               <path d="M128 202 L172 202 L164 224 L136 224 Z" fill="#cbd5e1" stroke="#94a3b8" strokeWidth="1.2" />
+
+              {/* Abductors / Outer Hips (Front view) */}
+              <path
+                d="M112 216 C102 226 98 248 106 264 C112 266 118 256 118 244 C118 234 116 222 112 216 Z"
+                className={`anatomy-muscle-clean ${isSelected('abductors') ? 'active' : ''}`}
+                onClick={() => handleMuscleClick('abductors')}
+              >
+                <title>Abductores (Cadera Lateral) Derecho</title>
+              </path>
+              <path
+                d="M188 216 C198 226 202 248 194 264 C188 266 182 256 182 244 C182 234 184 222 188 216 Z"
+                className={`anatomy-muscle-clean ${isSelected('abductors') ? 'active' : ''}`}
+                onClick={() => handleMuscleClick('abductors')}
+              >
+                <title>Abductores (Cadera Lateral) Izquierdo</title>
+              </path>
 
               {/* Quadriceps */}
               <path
@@ -305,6 +333,22 @@ export const MuscleBodyMap: React.FC<MuscleBodyMapProps> = ({
                 onClick={() => handleMuscleClick('quadriceps')}
               >
                 <title>Cuádriceps Izquierdo</title>
+              </path>
+
+              {/* Adductors / Inner Thigh (Front view) */}
+              <path
+                d="M136 228 C144 240 148 264 146 294 C140 290 134 270 132 244 Z"
+                className={`anatomy-muscle-clean ${isSelected('adductors') ? 'active' : ''}`}
+                onClick={() => handleMuscleClick('adductors')}
+              >
+                <title>Aductores (Cara Interna) Derecho</title>
+              </path>
+              <path
+                d="M164 228 C156 240 152 264 154 294 C160 290 166 270 168 244 Z"
+                className={`anatomy-muscle-clean ${isSelected('adductors') ? 'active' : ''}`}
+                onClick={() => handleMuscleClick('adductors')}
+              >
+                <title>Aductores (Cara Interna) Izquierdo</title>
               </path>
 
               {/* Knees */}
@@ -419,6 +463,15 @@ export const MuscleBodyMap: React.FC<MuscleBodyMapProps> = ({
                 <title>Dorsal Ancho Izquierdo (Lats)</title>
               </path>
 
+              {/* Middle Back / Rhomboids */}
+              <path
+                d="M136 158 L164 158 L160 192 L140 192 Z"
+                className={`anatomy-muscle-clean ${isSelected('middle back') ? 'active' : ''}`}
+                onClick={() => handleMuscleClick('middle back')}
+              >
+                <title>Espalda Media / Romboides</title>
+              </path>
+
               {/* Lower Back (Lumbar) */}
               <path
                 d="M136 194 L164 194 L160 226 L140 226 Z"
@@ -428,7 +481,23 @@ export const MuscleBodyMap: React.FC<MuscleBodyMapProps> = ({
                 <title>Lumbar (Erectores Espinales)</title>
               </path>
 
-              {/* Glutes */}
+              {/* Abductors / Gluteus Medius (Back view) */}
+              <path
+                d="M110 222 C100 230 96 250 102 266 C108 268 114 258 116 244 C116 234 114 224 110 222 Z"
+                className={`anatomy-muscle-clean ${isSelected('abductors') ? 'active' : ''}`}
+                onClick={() => handleMuscleClick('abductors')}
+              >
+                <title>Abductores / Glúteo Medio Derecho</title>
+              </path>
+              <path
+                d="M190 222 C200 230 204 250 198 266 C192 268 186 258 184 244 C184 234 186 224 190 222 Z"
+                className={`anatomy-muscle-clean ${isSelected('abductors') ? 'active' : ''}`}
+                onClick={() => handleMuscleClick('abductors')}
+              >
+                <title>Abductores / Glúteo Medio Izquierdo</title>
+              </path>
+
+              {/* Glutes (Gluteus Maximus) */}
               <path
                 d="M124 228 C112 232 108 258 114 280 C124 290 142 288 146 276 C148 260 148 242 144 228 Z"
                 className={`anatomy-muscle-clean ${isSelected('glutes') ? 'active' : ''}`}
@@ -458,6 +527,22 @@ export const MuscleBodyMap: React.FC<MuscleBodyMapProps> = ({
                 onClick={() => handleMuscleClick('hamstrings')}
               >
                 <title>Isquiotibiales Izquierdos</title>
+              </path>
+
+              {/* Adductors / Inner Thigh (Back view) */}
+              <path
+                d="M138 282 C144 294 146 316 142 334 C138 330 134 312 134 292 Z"
+                className={`anatomy-muscle-clean ${isSelected('adductors') ? 'active' : ''}`}
+                onClick={() => handleMuscleClick('adductors')}
+              >
+                <title>Aductores Derechos</title>
+              </path>
+              <path
+                d="M162 282 C156 294 154 316 158 334 C162 330 166 312 166 292 Z"
+                className={`anatomy-muscle-clean ${isSelected('adductors') ? 'active' : ''}`}
+                onClick={() => handleMuscleClick('adductors')}
+              >
+                <title>Aductores Izquierdos</title>
               </path>
 
               {/* Calves */}
@@ -507,7 +592,7 @@ export const MuscleBodyMap: React.FC<MuscleBodyMapProps> = ({
                 }}
               >
                 <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>
-                  {MUSCLES_INFO[m]?.nameEs.split(' ')[0]}
+                  {getCleanMuscleName(m)}
                 </div>
                 <div style={{ fontSize: '0.74rem', opacity: 0.8, marginTop: '2px' }}>
                   {count} ejercicios
@@ -530,6 +615,10 @@ export const MuscleBodyMap: React.FC<MuscleBodyMapProps> = ({
       >
         {currentMuscleList.map((m) => {
           const active = isSelected(m);
+          const count = EXERCISES_DATA.filter(
+            (e) => e.primaryMuscles.includes(m) || e.secondaryMuscles.includes(m)
+          ).length;
+
           return (
             <button
               key={m}
@@ -550,11 +639,12 @@ export const MuscleBodyMap: React.FC<MuscleBodyMapProps> = ({
                 boxShadow: active ? '0 4px 14px rgba(37, 99, 235, 0.3)' : '0 1px 3px rgba(0,0,0,0.03)',
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
+                flexShrink: 0,
                 transition: 'all 0.2s ease',
               }}
             >
               {active && <Check size={13} />}
-              {MUSCLES_INFO[m]?.nameEs.split(' ')[0]}
+              {getCleanMuscleName(m)} <span style={{ opacity: 0.7, fontSize: '0.75rem' }}>({count})</span>
             </button>
           );
         })}
