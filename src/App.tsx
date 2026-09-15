@@ -14,6 +14,7 @@ import { RestTimerModal } from './components/workout/RestTimerModal';
 import { PlateCalculatorModal } from './components/workout/PlateCalculatorModal';
 import { RoutineBuilderModal } from './components/workout/RoutineBuilderModal';
 import { StrengthAssessmentModal } from './components/strength/StrengthAssessmentModal';
+import { ScientificCoachModal } from './components/coach/ScientificCoachModal';
 import { HistoryView } from './components/history/HistoryView';
 import { PRTrackerView } from './components/history/PRTrackerView';
 import { BottomGlassNav, NavTab } from './components/navigation/BottomGlassNav';
@@ -22,6 +23,7 @@ import {
   Clock,
   ChevronRight,
   Zap,
+  Sparkles,
 } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -48,6 +50,7 @@ export const App: React.FC = () => {
   const [plateCalcWeight, setPlateCalcWeight] = useState<number>(60);
   const [isRoutineBuilderOpen, setIsRoutineBuilderOpen] = useState<boolean>(false);
   const [isStrengthModalOpen, setIsStrengthModalOpen] = useState<boolean>(false);
+  const [isCoachModalOpen, setIsCoachModalOpen] = useState<boolean>(false);
 
   const [history, setHistory] = useState<WorkoutSession[]>(() =>
     StorageService.getWorkoutHistory()
@@ -211,6 +214,26 @@ export const App: React.FC = () => {
 
         {/* Quick Actions */}
         <div className="app-header-actions">
+          <button
+            className="clean-button"
+            style={{
+              padding: '6px 11px',
+              fontSize: '0.78rem',
+              borderRadius: 'var(--radius-pill)',
+              background: '#111318',
+              color: '#ffffff',
+              borderColor: '#111318',
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+            }}
+            onClick={() => setIsCoachModalOpen(true)}
+            title="Coach Científico 100% Offline (Evidencia & Preguntas Guiadas)"
+          >
+            <Sparkles size={13} color="#60a5fa" /> <span className="hidden-mobile">Coach </span>Ciencia
+          </button>
+
           <button
             className="clean-button"
             style={{
@@ -413,6 +436,50 @@ export const App: React.FC = () => {
                   ))}
                 </div>
               </div>
+
+              {/* Scientific Coach Teaser Banner */}
+              <div
+                className="clean-card"
+                style={{
+                  padding: '18px 20px',
+                  background: '#111318',
+                  color: '#ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '14px',
+                  cursor: 'pointer',
+                  borderRadius: 'var(--radius-lg)',
+                }}
+                onClick={() => setIsCoachModalOpen(true)}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <div
+                    style={{
+                      width: '42px',
+                      height: '42px',
+                      borderRadius: '12px',
+                      background: '#1e293b',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#60a5fa',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Sparkles size={22} />
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 800, fontSize: '0.98rem', color: '#ffffff' }}>
+                      ¿Dudas sobre series, RIR, creatina o descanso?
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '2px' }}>
+                      Pregunta al Coach Científico de OpenGym (100% Offline con meta-análisis de universidades)
+                    </div>
+                  </div>
+                </div>
+                <ChevronRight size={18} color="#60a5fa" />
+              </div>
             </div>
           )}
         </>
@@ -510,6 +577,12 @@ export const App: React.FC = () => {
       <StrengthAssessmentModal
         isOpen={isStrengthModalOpen}
         onClose={() => setIsStrengthModalOpen(false)}
+      />
+
+      {/* Scientific Offline Coach Assistant Modal */}
+      <ScientificCoachModal
+        isOpen={isCoachModalOpen}
+        onClose={() => setIsCoachModalOpen(false)}
       />
 
       {/* Minimal Bottom Dock */}
