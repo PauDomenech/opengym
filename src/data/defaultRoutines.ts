@@ -1,0 +1,77 @@
+import { Routine } from '../types/workout';
+
+export const DEFAULT_ROUTINES: Routine[] = [
+  {
+    id: 'push-day-hypertrophy',
+    title: 'Empuje (Push) - Pecho, Hombro y Tríceps',
+    description: 'Enfocado en masa muscular y fuerza en movimientos de empuje del torso.',
+    category: 'PPL',
+    exercises: [
+      { exerciseId: 'barbell-bench-press', targetSets: 4, targetReps: '6-8', restTimeSeconds: 120 },
+      { exerciseId: 'incline-dumbbell-press', targetSets: 3, targetReps: '8-10', restTimeSeconds: 90 },
+      { exerciseId: 'chest-dips', targetSets: 3, targetReps: '10-12', restTimeSeconds: 90 },
+      { exerciseId: 'cable-crossover', targetSets: 3, targetReps: '12-15', restTimeSeconds: 60 },
+      { exerciseId: 'dumbbell-lateral-raise', targetSets: 4, targetReps: '12-15', restTimeSeconds: 60 },
+      { exerciseId: 'tricep-rope-pushdown', targetSets: 3, targetReps: '10-12', restTimeSeconds: 60 },
+      { exerciseId: 'skull-crushers', targetSets: 3, targetReps: '10-12', restTimeSeconds: 75 },
+    ],
+  },
+  {
+    id: 'pull-day-hypertrophy',
+    title: 'Tirón (Pull) - Espalda, Deltoides Posterior y Bíceps',
+    description: 'Amplitud dorsal, densidad de espalda media y desarrollo de brazos.',
+    category: 'PPL',
+    exercises: [
+      { exerciseId: 'deadlift', targetSets: 3, targetReps: '5-6', restTimeSeconds: 180 },
+      { exerciseId: 'pull-ups', targetSets: 4, targetReps: '6-10', restTimeSeconds: 120 },
+      { exerciseId: 'barbell-row', targetSets: 4, targetReps: '8-10', restTimeSeconds: 90 },
+      { exerciseId: 'seated-cable-row', targetSets: 3, targetReps: '10-12', restTimeSeconds: 75 },
+      { exerciseId: 'face-pull', targetSets: 4, targetReps: '15', restTimeSeconds: 60 },
+      { exerciseId: 'barbell-bicep-curl', targetSets: 3, targetReps: '8-10', restTimeSeconds: 75 },
+      { exerciseId: 'hammer-curl', targetSets: 3, targetReps: '10-12', restTimeSeconds: 60 },
+    ],
+  },
+  {
+    id: 'legs-glutes-quads',
+    title: 'Pierna (Legs) - Cuádriceps, Femorales y Glúteos',
+    description: 'Entrenamiento completo de tren inferior para fuerza y volumen de piernas.',
+    category: 'PPL',
+    exercises: [
+      { exerciseId: 'barbell-squat', targetSets: 4, targetReps: '6-8', restTimeSeconds: 180 },
+      { exerciseId: 'romanian-deadlift', targetSets: 3, targetReps: '8-10', restTimeSeconds: 120 },
+      { exerciseId: 'leg-press-machine', targetSets: 3, targetReps: '10-12', restTimeSeconds: 90 },
+      { exerciseId: 'bulgarian-split-squat', targetSets: 3, targetReps: '10-12', restTimeSeconds: 90 },
+      { exerciseId: 'lying-leg-curl', targetSets: 3, targetReps: '12-15', restTimeSeconds: 60 },
+      { exerciseId: 'hip-thrust', targetSets: 3, targetReps: '10-12', restTimeSeconds: 90 },
+      { exerciseId: 'standing-calf-raise', targetSets: 4, targetReps: '15-20', restTimeSeconds: 60 },
+    ],
+  },
+  {
+    id: 'upper-body-power',
+    title: 'Torso Completo (Upper Body)',
+    description: 'Sesión equilibrada de empuje y tirón para rutina Torso/Pierna.',
+    category: 'UpperLower',
+    exercises: [
+      { exerciseId: 'incline-dumbbell-press', targetSets: 4, targetReps: '8-10', restTimeSeconds: 90 },
+      { exerciseId: 'pull-ups', targetSets: 4, targetReps: '8-10', restTimeSeconds: 90 },
+      { exerciseId: 'overhead-press', targetSets: 3, targetReps: '6-8', restTimeSeconds: 120 },
+      { exerciseId: 'seated-cable-row', targetSets: 3, targetReps: '10-12', restTimeSeconds: 75 },
+      { exerciseId: 'incline-dumbbell-curl', targetSets: 3, targetReps: '10-12', restTimeSeconds: 60 },
+      { exerciseId: 'overhead-cable-tricep-extension', targetSets: 3, targetReps: '10-12', restTimeSeconds: 60 },
+    ],
+  },
+  {
+    id: 'dumbbells-home-fullbody',
+    title: 'Cuerpo Completo Solo con Mancuernas',
+    description: 'Perfecto para entrenar en casa o en gimnasios de hotel con mancuernas.',
+    category: 'FullBody',
+    exercises: [
+      { exerciseId: 'incline-dumbbell-press', targetSets: 3, targetReps: '10-12', restTimeSeconds: 60 },
+      { exerciseId: 'single-arm-dumbbell-row', targetSets: 3, targetReps: '10-12', restTimeSeconds: 60 },
+      { exerciseId: 'bulgarian-split-squat', targetSets: 3, targetReps: '10-12', restTimeSeconds: 60 },
+      { exerciseId: 'dumbbell-lateral-raise', targetSets: 3, targetReps: '12-15', restTimeSeconds: 45 },
+      { exerciseId: 'hammer-curl', targetSets: 3, targetReps: '10-12', restTimeSeconds: 45 },
+      { exerciseId: 'plank', targetSets: 3, targetReps: '45s', restTimeSeconds: 45 },
+    ],
+  },
+];
