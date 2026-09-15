@@ -414,3 +414,59 @@ h1, h2, h3, h4, h5, h6 {
     transform: translate(-50%, 0);
   }
 }
+
+/* App Header & Responsive Mobile Utilities */
+.app-header {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.app-header-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.22);
+  flex-shrink: 0;
+  border: 1px solid #e2e8f0;
+}
+
+.app-header-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+@media (max-width: 540px) {
+  .app-header {
+    margin-bottom: 16px;
+  }
+  
+  .app-header-logo {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+  }
+
+  .hidden-mobile {
+    display: none !important;
+  }
+
+  .header-subtitle {
+    font-size: 0.7rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

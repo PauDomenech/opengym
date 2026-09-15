@@ -188,41 +188,34 @@ export const App: React.FC = () => {
   return (
     <div className="app-container">
       {/* App Header with OpenGym Branding */}
-      <header style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '12px',
-              background: 'var(--accent-blue-gradient)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 6px 16px rgba(37, 99, 235, 0.3)',
+      <header className="app-header">
+        <div className="app-header-brand">
+          <img
+            src="./logo.png"
+            alt="OpenGym"
+            className="app-header-logo"
+            onError={(e) => {
+              // Fallback to stylized SVG/color if image fails
+              e.currentTarget.style.display = 'none';
             }}
-          >
-            <span style={{ color: '#ffffff', fontWeight: 900, fontSize: '1.2rem', fontFamily: 'var(--font-display)' }}>
-              OG
-            </span>
-          </div>
+          />
           <div>
-            <h1 style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.1 }}>
+            <h1 style={{ fontSize: '1.35rem', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.1, margin: 0 }}>
               Open<span style={{ color: 'var(--accent-primary)' }}>Gym</span>
             </h1>
-            <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-              Tu app de entrenamiento 100% offline
+            <span className="header-subtitle" style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+              Open-source GymApp
             </span>
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+        <div className="app-header-actions">
           <button
             className="clean-button"
             style={{
-              padding: '7px 12px',
-              fontSize: '0.8rem',
+              padding: '6px 11px',
+              fontSize: '0.78rem',
               borderRadius: 'var(--radius-pill)',
               background: '#eff6ff',
               color: 'var(--accent-primary)',
@@ -232,12 +225,12 @@ export const App: React.FC = () => {
             onClick={() => setIsStrengthModalOpen(true)}
             title="Calculadora de Fuerza y Nivel Físico"
           >
-            <Zap size={14} /> Evaluar Fuerza
+            <Zap size={14} /> <span className="hidden-mobile">Evaluar </span>Fuerza
           </button>
 
           <button
             className="clean-button"
-            style={{ padding: '7px 12px', fontSize: '0.8rem', borderRadius: 'var(--radius-pill)' }}
+            style={{ padding: '6px 11px', fontSize: '0.78rem', borderRadius: 'var(--radius-pill)' }}
             onClick={() => {
               setPlateCalcWeight(60);
               setIsPlateCalcOpen(true);
@@ -248,14 +241,14 @@ export const App: React.FC = () => {
 
           <button
             className="clean-button-icon"
-            style={{ width: '36px', height: '36px' }}
+            style={{ width: '34px', height: '34px' }}
             onClick={() => {
               setRestTimerSeconds(90);
               setIsRestTimerOpen(true);
             }}
-            title="Cronómetro"
+            title="Cronómetro de descanso"
           >
-            <Clock size={16} color="var(--accent-primary)" />
+            <Clock size={15} color="var(--accent-primary)" />
           </button>
         </div>
       </header>
